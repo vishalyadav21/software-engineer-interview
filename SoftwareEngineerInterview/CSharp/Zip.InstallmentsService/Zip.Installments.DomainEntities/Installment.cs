@@ -1,6 +1,6 @@
 using System;
 
-namespace Zip.InstallmentsService
+namespace Zip.Installments.DomainEntities
 {
     /// <summary>
     /// Data structure which defines all the properties for an installment.
@@ -21,5 +21,9 @@ namespace Zip.InstallmentsService
         /// Gets or sets the amount of the installment.
         /// </summary>
         public decimal Amount { get; set; }
+
+        
+
+        public string PurchaseId { get; set; }
 	}
 }
