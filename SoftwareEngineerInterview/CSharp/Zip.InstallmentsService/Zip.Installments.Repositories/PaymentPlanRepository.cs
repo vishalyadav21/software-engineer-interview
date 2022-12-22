@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Threading.Tasks;
 using Zip.Installments.DomainEntities;
 using Zip.Installments.Repositories.AppContext;
 using Zip.Installments.Repositories.Helpers;
@@ -9,7 +10,7 @@ namespace Zip.Installments.Repositories
 {
     public interface IPaymentPlanRepository
     {
-        bool CreatePaymentPlan(PaymentPlan paymentPlanModel);
+        Task<bool> CreatePaymentPlan(PaymentPlan paymentPlanModel);
     }
 
     public class PaymentPlanRepository : IPaymentPlanRepository
@@ -27,26 +28,26 @@ namespace Zip.Installments.Repositories
             _logger = logger;
         } 
 
-        public bool CreatePaymentPlan(PaymentPlan paymentPlanModel)
+        public async Task<bool> CreatePaymentPlan(PaymentPlan paymentPlanModel)
         {
             try
-            {
+            { 
                 if (paymentPlanModel != null)
                 { 
                     PaymentPlan paymentPlan = new PaymentPlan();
                     paymentPlan.Id = Guid.NewGuid();
-                    _applicationDbContext.tblPaymentPlan.Add(paymentPlanModel);
-                    _applicationDbContext.SaveChanges(); 
+                    await _applicationDbContext.tblPaymentPlan.AddAsync(paymentPlanModel);
+                    await _applicationDbContext.SaveChangesAsync(); 
                     for (int i = 0; i < paymentPlanModel.Installments; i++)
                     {
                         var installment = new Installment();
                         installment.Amount = paymentPlanModel.PurchaseAmount / paymentPlanModel.Installments;
-                        installment.DueDate = (i == 0) ? DateTime.Today.AddDays(0) :DateTime.Today.AddDays(paymentPlanModel.PurchaseFrequency*i); 
+                        installment.DueDate = (i == 0) ? DateTime.Today.AddDays(0) : DateTime.Today.AddDays(paymentPlanModel.PurchaseFrequency * i); 
                         installment.Id = new Guid();
-                        installment.PurchaseId = paymentPlan.Id.ToString();  
+                        installment.PurchaseId = paymentPlan.Id.ToString();
 
-                        _applicationDbContext.tblInstallment.Add(installment);
-                        _applicationDbContext.SaveChanges();
+                        await _applicationDbContext.tblInstallment.AddAsync(installment);
+                        await _applicationDbContext.SaveChangesAsync();
                         _logger.LogInformation("Added installment details");
                     }  
                     return true;

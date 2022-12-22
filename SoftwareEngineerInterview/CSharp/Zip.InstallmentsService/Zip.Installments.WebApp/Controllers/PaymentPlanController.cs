@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
-using Zip.Installments.DomainEntities;
+using Zip.Installments.WebApp.Models;
 
 namespace Zip.Installments.WebApp.Controllers
 {
@@ -24,15 +24,15 @@ namespace Zip.Installments.WebApp.Controllers
         }
         public IActionResult Index()
         {
-            List<PaymentPlan> paymentPlan = new List<PaymentPlan>();
+            var paymentPlan = new List<PaymentPlanViewModel>();
             return View("Index", paymentPlan); 
         }
 
         [HttpGet]
         public IActionResult Create()
         {
-            PaymentPlan  paymentPlan = new  PaymentPlan();
-            List<SelectListItem> items = new List<SelectListItem>();
+            var paymentPlan = new PaymentPlanViewModel();
+            var items = new List<SelectListItem>();
             items.Add(new SelectListItem { Text = "7 days", Value = "7" });
             items.Add(new SelectListItem { Text = "14 days", Value = "14" });
             items.Add(new SelectListItem { Text = "21 days", Value = "21" });  
@@ -42,11 +42,11 @@ namespace Zip.Installments.WebApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(PaymentPlan paymentPlan)  
+        public IActionResult Create(PaymentPlanViewModel paymentPlan)  
         {
             if (ModelState.IsValid)
-            {
-                HttpClient client = new HttpClient();
+            { 
+                var client = new HttpClient();
                 client.BaseAddress = new Uri(apiBaseUrl + string.Format("/paymentplan/"));
                 var json = JsonConvert.SerializeObject(paymentPlan);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");

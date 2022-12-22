@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using Zip.Installments.DomainEntities;
 using Zip.Installments.Repositories;
+using Zip.Installments.WebApi.Models;
 
 namespace Zip.Installments.WebApi.Controllers
 {
@@ -25,15 +25,15 @@ namespace Zip.Installments.WebApi.Controllers
         } 
          
         [HttpPost]
-        public IActionResult Post([FromBody] PaymentPlan paymentPlan)
-        {
+        public IActionResult Post([FromBody] PaymentPlanViewModel paymentPlan)
+        { 
             if (paymentPlan != null)
             {
-                bool result = _paymentPlanRepository.CreatePaymentPlan(paymentPlan);
-                if (result)
+                var result = _paymentPlanRepository.CreatePaymentPlan(paymentPlan);
+                if (result.Result)
                 {
                     _logger.LogInformation("created payment plan at :" + DateTime.Now);
-                    return Ok(result);
+                    return Ok(result.Result);
                 } 
             }
             _logger.LogError("Unable to create payment plan");
