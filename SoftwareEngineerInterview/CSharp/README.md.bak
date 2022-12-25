@@ -28,7 +28,3 @@ dotnet run
 cd Zip.Installments.Test
 dotnet test Zip.Installments.Test.sln
 ```
-
-```
-WebApi and Webapp projects need to run at the same time. both projects can be run at same time by setting multiple projects as startup project.
-```
