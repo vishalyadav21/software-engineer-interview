@@ -1,7 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using System.Collections.Generic;
-using System.Data.Entity;
+using System.Collections.Generic; 
 using System.Linq;
 using System.Threading.Tasks;
 using Zip.Installments.DomainEntities;
@@ -25,39 +26,38 @@ namespace Zip.Installments.Test
         }
     }
     public class Tests
-    {  
+    {
+        protected Mock<IPaymentPlanRepository> paymentPlanRepository;
+        protected Mock<ILogger> logger; 
+        private PaymentPlan paymentPlan;
+
         [SetUp]
         public void Setup()
         {
-            var paymentPlan = new PaymentPlan
+            paymentPlan = new PaymentPlan
             {
                 Id = System.Guid.NewGuid(),
                 Installments = 4,
                 PurchaseAmount = 100,
                 PurchaseFrequency = 14
-            }; 
-           // var myDbContextMock = new Mock<IApplicationDbContext>();
-            //myDbContextMock.Setup(p => p.Entities).Returns(myDbContextMock.GetQueryableMockDbSet<PaymentPlan>(paymentPlan));
-            //myDbContextMock.Setup(p => p.SaveChanges()).Returns(1);
+            };  
         }
 
         [Test] 
         public void WhenCreatePaymentPlanWithValidOrderAmount_ShouldReturnTrue()
-        { 
-            //var paymentPlan = new PaymentPlan
-            //{
-            //    Id = System.Guid.NewGuid(),
-            //    Installments = 4,
-            //    PurchaseAmount = 100,
-            //    PurchaseFrequency = 14
-            //};
-            //var mock = new Mock<IPaymentPlanRepository>();
-            //mock.Setup(p => p.CreatePaymentPlan(It.IsAny<PaymentPlan>())).Returns(true);
-            //var sut = new PaymentPlanRepository(mock.Object);
+        {
+            var testObject = new PaymentPlan();
+            var context = new Mock<ApplicationDbContext>();
+            var dbSetMock = new Mock<DbSet<PaymentPlan>>();
+            var mock = new Mock<IPaymentPlanRepository>();
+            var _mockLogger = new Mock<ILogger<IPaymentPlanRepository>>();
+            context.Setup(x => x.Set<PaymentPlan>()).Returns(dbSetMock.Object); 
+            mock.Setup(p => p.CreatePaymentPlan(It.IsAny<PaymentPlan>())).Returns(new Task<bool>(() => true));
+            context.Setup(p => p.SaveChanges()).Returns(1);
 
-            //var result = sut.CreatePaymentPlan(paymentPlan);
-
-            //Assert.IsTrue(result);
+            var sut = new PaymentPlanRepository(context.Object, _mockLogger.Object); 
+            var result = sut.CreatePaymentPlan(paymentPlan);  
+            Assert.IsTrue(result.Result);
         }
     }
 }

@@ -16,8 +16,8 @@ namespace Zip.Installments.Repositories
         private readonly ILogger _logger; 
 
         private readonly ApplicationDbContext _applicationDbContext;
-
-        public PaymentPlanRepository(ApplicationDbContext applicationDbContext, ILogger<PaymentPlanRepository> logger)
+         
+        public PaymentPlanRepository(ApplicationDbContext applicationDbContext, ILogger<IPaymentPlanRepository> logger)
         {
             _applicationDbContext = applicationDbContext;
             _logger = logger;
