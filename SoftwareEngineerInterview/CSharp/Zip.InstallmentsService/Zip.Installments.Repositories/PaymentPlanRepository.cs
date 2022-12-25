@@ -1,10 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
 using Zip.Installments.DomainEntities;
 using Zip.Installments.Repositories.AppContext;
-using Zip.Installments.Repositories.Helpers;
 
 namespace Zip.Installments.Repositories
 {
@@ -19,25 +17,30 @@ namespace Zip.Installments.Repositories
 
         private readonly ApplicationDbContext _applicationDbContext;
 
-        private readonly AppSettings _appSettings;
-
-        public PaymentPlanRepository(ApplicationDbContext applicationDbContext, IOptions<AppSettings> appSettings, ILogger<PaymentPlanRepository> logger)
+        public PaymentPlanRepository(ApplicationDbContext applicationDbContext, ILogger<PaymentPlanRepository> logger)
         {
             _applicationDbContext = applicationDbContext;
-            _appSettings = appSettings.Value;
             _logger = logger;
         } 
 
+        /// <summary>
+        /// Created playment plan with Installments. Installments computed based on input 
+        /// </summary>
+        /// <param name="paymentPlanModel"></param>
+        /// <returns></returns>
         public async Task<bool> CreatePaymentPlan(PaymentPlan paymentPlanModel)
         {
             try
             { 
                 if (paymentPlanModel != null)
                 { 
+
                     PaymentPlan paymentPlan = new PaymentPlan();
                     paymentPlan.Id = Guid.NewGuid();
                     await _applicationDbContext.tblPaymentPlan.AddAsync(paymentPlanModel);
-                    await _applicationDbContext.SaveChangesAsync(); 
+                    await _applicationDbContext.SaveChangesAsync();  //Inserted payment record into table
+
+                    // Logic to create installments.
                     for (int i = 0; i < paymentPlanModel.Installments; i++)
                     {
                         var installment = new Installment();

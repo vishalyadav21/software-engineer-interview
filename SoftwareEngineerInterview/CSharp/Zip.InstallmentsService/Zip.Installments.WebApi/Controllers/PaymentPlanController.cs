@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using Zip.Installments.DomainEntities;
 using Zip.Installments.Repositories;
 using Zip.Installments.WebApi.Models;
 
@@ -25,10 +26,17 @@ namespace Zip.Installments.WebApi.Controllers
         } 
          
         [HttpPost]
-        public IActionResult Post([FromBody] PaymentPlanViewModel paymentPlan)
+        public IActionResult Post([FromBody] PaymentPlanDTO paymentPlanDTO)
         { 
-            if (paymentPlan != null)
+            if (ModelState.IsValid && paymentPlanDTO != null)
             {
+                //mapping DTO with Domain Entity for time being. This can be achieved by Automapper.
+                var paymentPlan = new PaymentPlan();
+                paymentPlan.Id = paymentPlanDTO.Id;
+                paymentPlan.Installments = paymentPlanDTO.Installments;
+                paymentPlan.PurchaseAmount = paymentPlanDTO.PurchaseAmount;
+                paymentPlan.PurchaseFrequency = paymentPlanDTO.PurchaseFrequency;
+
                 var result = _paymentPlanRepository.CreatePaymentPlan(paymentPlan);
                 if (result.Result)
                 {
